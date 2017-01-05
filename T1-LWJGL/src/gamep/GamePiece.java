@@ -15,7 +15,9 @@ enum Shape{
     SQUARE,
     TRIANGLE,
     INVERSE_TRIANGLE,
-    CIRCLE
+    CIRCLE,
+    DIAMOND,
+    HOURGLASS
     //PARALLELOGRAM;
 }
 
@@ -55,6 +57,12 @@ public class GamePiece {
                 break;
             case CIRCLE:
                 createCirclePoints();
+                break;
+            case DIAMOND:
+                createDiamondPoints();
+                break;
+            case HOURGLASS:
+                createHourglassPoints();
                 break;
             default:
                 break;
@@ -103,5 +111,36 @@ public class GamePiece {
             this.points.add(new Point((int)(this.point.getX() + (radius * Math.cos(i * twicePi / triangleAmount))),
                                       (int)(this.point.getY() + (radius * Math.sin(i * twicePi / triangleAmount)))));
         }
+    }
+    
+    void createDiamondPoints(){
+        this.points.add(new Point((int)this.point.getX() - radius,
+                                  (int)this.point.getY()));
+        this.points.add(new Point((int)this.point.getX() + radius,
+                                  (int)this.point.getY()));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() + radius));
+        this.points.add(new Point((int)this.point.getX() - radius,
+                                  (int)this.point.getY()));
+        this.points.add(new Point((int)this.point.getX() + radius,
+                                  (int)this.point.getY()));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() - radius));
+    }
+    
+    void createHourglassPoints(){
+        this.points.add(new Point((int)this.point.getX() - radius,
+                                  (int)this.point.getY() - radius));
+        this.points.add(new Point((int)this.point.getX() + radius,
+                                  (int)this.point.getY() - radius));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() + radius));
+        
+        this.points.add(new Point((int)this.point.getX() + radius,
+                                  (int)this.point.getY() + radius));
+        this.points.add(new Point((int)this.point.getX() - radius,
+                                  (int)this.point.getY() + radius));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() - radius));
     }
 }
