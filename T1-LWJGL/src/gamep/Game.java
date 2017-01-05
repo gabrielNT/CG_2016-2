@@ -23,6 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import utils.lwjgl.graphic.Texture;
+import static org.lwjgl.stb.STBEasyFont.stb_easy_font_print;
 
 enum State{
     GAME_MENU,
@@ -34,17 +35,22 @@ enum State{
 public class Game {
     static int SCREEN_WIDTH = 800;
     static int SCREEN_HEIGHT = 600;
+    static final int BASE_FONT_HEIGHT = 14;
     static int initialLifes = 5;
     static String background = System.getProperty("user.dir") + "\\imgs\\crack2.png";
     static float shape_r = 0.8f;
     static float shape_g = 0.3f;
     static float shape_b = 0.3f;
+    static String labelTime = "";
+    static String labelScore = "";
+    static String labelFinalScore = "";
+    static int currentScore = 0;
     
     static int dx = 0, dy = 0;
     static long window;
     static Random rng = new Random();
     
-    int currentLifes = initialLifes;
+    int currentLives = initialLifes;
     int score = 0; 
     int numberOfMatches = 0;
     
@@ -193,8 +199,9 @@ public class Game {
                 game.currentAnswerTime = 5000;
                 game.remainingAnswerTime = game.currentAnswerTime;
                 game.beginTime = System.currentTimeMillis();
-                game.currentLifes = initialLifes;
+                game.currentLives = initialLifes;
                 game.numberOfMatches = 0;
+                currentScore=0;
             }
         }
         else if(InputHandler.isKeyDown(GLFW_KEY_ESCAPE)){
@@ -205,11 +212,12 @@ public class Game {
     public static void updateTimer(Game game){
         game.endTime = System.currentTimeMillis();
         game.remainingAnswerTime -= (game.endTime - game.beginTime);
+        labelTime = "Remaining Time: "+String.valueOf(game.remainingAnswerTime/1000.0);
         game.beginTime = game.endTime;
         System.out.println(game.remainingAnswerTime);
         
         if(game.remainingAnswerTime <= 0){
-            game.currentLifes--;
+            game.currentLives--;
             changeGamePieces(game);
             game.remainingAnswerTime = game.currentAnswerTime;
         }
@@ -321,14 +329,16 @@ public class Game {
                 dy = 0;
                 
                 if (game.solution == 'd'){
-                    System.out.println("Acertou!!!");
+                    //System.out.println("Acertou!!!");
+                    currentScore += 10;
                     game.numberOfMatches++;
                     if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
-                    game.currentLifes--;
-                    System.out.println(game.currentLifes);
+                    currentScore -= 15;
+                    game.currentLives--;
+                    System.out.println(game.currentLives);
                 }
                 
                 changeGamePieces(game);
@@ -345,14 +355,16 @@ public class Game {
                 dy = 0;
                 
                 if (game.solution == 'u'){
-                    System.out.println("Acertou!!!");
+                    //System.out.println("Acertou!!!");
+                    currentScore += 10;
                     game.numberOfMatches++;
                     if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
-                    game.currentLifes--;
-                    System.out.println(game.currentLifes);
+                    currentScore -= 15;
+                    game.currentLives--;
+                    System.out.println(game.currentLives);
                 }
                 
                 changeGamePieces(game);
@@ -369,14 +381,16 @@ public class Game {
                 dy = 0;
                 
                 if (game.solution == 'r'){
-                    System.out.println("Acertou!!!");
+                    //System.out.println("Acertou!!!");
+                    currentScore += 10;
                     game.numberOfMatches++;
                     if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
-                    game.currentLifes--;
-                    System.out.println(game.currentLifes);
+                    currentScore -= 15;
+                    game.currentLives--;
+                    System.out.println(game.currentLives);
                 }
                 
                 changeGamePieces(game);
@@ -393,14 +407,16 @@ public class Game {
                 dy = 0;
                 
                 if (game.solution == 'l'){
-                    System.out.println("Acertou!!!");
+                    //System.out.println("Acertou!!!");
+                    currentScore += 10;
                     game.numberOfMatches++;
                     if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
-                    game.currentLifes--;
-                    System.out.println(game.currentLifes);
+                    currentScore -= 15;
+                    game.currentLives--;
+                    System.out.println(game.currentLives);
                 }
                 
                 changeGamePieces(game);
@@ -409,10 +425,11 @@ public class Game {
                 game.remainingAnswerTime = game.currentAnswerTime;
             }
         }
+        labelScore = "Score: "+String.valueOf(currentScore);
     }
     
     public static void gameMenu(Game game){
-        System.getProperty("user.dir");
+        System.getProperty("user.dir");        
         
         Texture texture = Texture.loadTexture(System.getProperty("user.dir") + "\\imgs\\menu.png");
         glEnable(GL_TEXTURE_2D);
@@ -455,8 +472,36 @@ public class Game {
         GL11.glVertex2f(0, SCREEN_HEIGHT);
         GL11.glEnd();
         GL11.glPopMatrix();
+        labelFinalScore = "Score final: "+String.valueOf(currentScore);
+        
+        printFinalScore();
         
         glDisable(GL_TEXTURE_2D);
+    }
+    
+    public static void printFinalScore()
+    {      
+        
+        ByteBuffer charBuffer = BufferUtils.createByteBuffer(labelFinalScore.length() * 270);
+        //text position (50f,50f in this case
+        int quads = stb_easy_font_print(5.0f, 20.0f, labelFinalScore, null, charBuffer);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, charBuffer);
+
+        float fontHeight, lineHeight;
+        fontHeight = BASE_FONT_HEIGHT;
+        lineHeight = BASE_FONT_HEIGHT;
+
+
+        glColor3f(0.0f, 1.0f, 0.0f); // Text color
+        float scaleFactor = 1.0f + 30 * 0.25f;
+        GL11.glPushMatrix();
+                GL11.glScalef(scaleFactor, scaleFactor, 1f);
+                GL11.glDrawArrays(GL_QUADS, 0, quads * 4);
+        GL11.glPopMatrix();       
+
+                
     }
     
     public static void gameLoop(Game game){
@@ -466,13 +511,13 @@ public class Game {
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
         // Setting stuff up for loop
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
+        float scale = 8.0f; //the character proportion
         // Rendering Looop
         while ( !glfwWindowShouldClose(window) ) {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
                 
-                switch (game.currentLifes){
+                
+                switch (game.currentLives){
                     case 5:
                         background = System.getProperty("user.dir") + "\\imgs\\crack1.png";
                         break;
@@ -490,6 +535,9 @@ public class Game {
                         break;
                     case 0:
                         game.setGameState(State.GAME_SCORES);
+                        labelScore = "";
+                        labelTime = "";
+                        
                         break;
                 }
                      
@@ -515,6 +563,12 @@ public class Game {
                         break;
                 }
                 
+                //TIME LABEL
+                drawTimerLabel(scale);
+                
+                //SCORE LABEL
+                drawScoreLabel(scale);
+                
                 // Should be in the end of the loop
                 glfwSwapBuffers(window); // swap the color buffers
 
@@ -522,6 +576,54 @@ public class Game {
                 update(game);
         }
         glDisable(GL_TEXTURE_2D);
+    }
+    
+    public static void drawTimerLabel(float scale)
+    {
+        ByteBuffer charBuffer = BufferUtils.createByteBuffer(labelTime.length() * 270);
+        //text position (50f,50f in this case
+        int quads = stb_easy_font_print(10.0f, 10.0f, labelTime, null, charBuffer);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, charBuffer);
+
+        float fontHeight, lineHeight;
+        fontHeight = BASE_FONT_HEIGHT;
+        lineHeight = BASE_FONT_HEIGHT;
+
+
+        GL11.glColor3f(169f / 255f, 183f / 255f, 198f / 255f); // Text color
+        float scaleFactor = 1.0f + scale * 0.25f;
+        GL11.glPushMatrix();
+                GL11.glScalef(scaleFactor, scaleFactor, 1f);
+                GL11.glDrawArrays(GL_QUADS, 0, quads * 4);
+        GL11.glPopMatrix();       
+
+
+    }
+    
+    public static void drawScoreLabel(float scale)
+    {
+        ByteBuffer charBuffer = BufferUtils.createByteBuffer(labelScore.length() * 270);
+        //text position (50f,50f in this case
+        int quads = stb_easy_font_print(10.0f, 25.0f, labelScore, null, charBuffer);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, charBuffer);
+
+        float fontHeight, lineHeight;
+        fontHeight = BASE_FONT_HEIGHT;
+        lineHeight = BASE_FONT_HEIGHT;
+
+
+        GL11.glColor3f(169f / 255f, 183f / 255f, 198f / 255f); // Text color
+        float scaleFactor = 1.0f + scale * 0.25f;
+        GL11.glPushMatrix();
+                GL11.glScalef(scaleFactor, scaleFactor, 1f);
+                GL11.glDrawArrays(GL_QUADS, 0, quads * 4);
+        GL11.glPopMatrix();       
+
+                
     }
     
     public static void drawCircle(Game game, int index, char type, int dx, int dy){
