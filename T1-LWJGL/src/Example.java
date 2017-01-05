@@ -179,8 +179,10 @@ public class Example {
                         glDisable(GL_TEXTURE_2D);
 	}
 
-	public static void main(String[] args) {
-		new Example().run();
-	}
+//	public static void main(String[] args) {
+//		new Example().run();
+//                System.out.println("Working Directory = " +
+//              System.getProperty("user.dir"));
+//	}
 
 }

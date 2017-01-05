@@ -22,6 +22,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import utils.lwjgl.graphic.Texture;
 
 enum State{
     GAME_MENU,
@@ -33,9 +34,16 @@ enum State{
 public class Game {
     static int SCREEN_WIDTH = 800;
     static int SCREEN_HEIGHT = 600;
+    static int initialLifes = 5;
+    static String background = System.getProperty("user.dir") + "\\imgs\\crack2.png";
+    
     static int dx = 0, dy = 0;
     static long window;
     static Random rng = new Random();
+    
+    int currentLifes = initialLifes;
+    int score = 0; 
+    int numberOfMatches = 0;
     
     State gameState;
     int width, height;
@@ -43,6 +51,13 @@ public class Game {
     ArrayList fixedPieces = new ArrayList();
     GameCenterPiece centerPiece;
     char solution;
+    
+    long beginTime;
+    long endTime;
+    long ellapsedTime;
+    long currentAnswerTime;
+    long remainingAnswerTime;
+    
     
     // This prevents our window from crashing later on.
     private static GLFWKeyCallback keyCallback;
@@ -84,16 +99,10 @@ public class Game {
         // Create the window
         window = glfwCreateWindow(SCREEN_WIDTH, 
                                   SCREEN_HEIGHT, 
-                                  "JOGUINEO", 
+                                  "Crazy Shapes", 
                                   NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
-
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, (windowAux, key, scancode, action, mods) -> {
-                if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-                        glfwSetWindowShouldClose(window, true); 
-        });
 
         // Get the thread stack and push a new frame
         try ( MemoryStack stack = stackPush() ) {
@@ -123,8 +132,9 @@ public class Game {
         
     public static Game initGame(){
         Game game = new Game(SCREEN_WIDTH, SCREEN_HEIGHT);
-        game.setGameState(State.GAME_SCREEN_WAITING);
+        game.setGameState(State.GAME_MENU);
         game.centerPieceIsMoving = false;
+        game.currentAnswerTime = 5000;
         
         game.centerPiece = new GameCenterPiece(SCREEN_WIDTH/2, 
                                                SCREEN_HEIGHT/2, 
@@ -143,36 +153,62 @@ public class Game {
     
     public static void update(Game game){
         if(InputHandler.isKeyDown(GLFW_KEY_DOWN)){
-            System.out.println("Down Pressed");
+            //System.out.println("Down Pressed");
             
             if(game.gameState == State.GAME_SCREEN_WAITING){
                 game.centerPiece.moveDown();
                 game.setGameState(State.GAME_SCREEN_MOVING);
             }
         }
-        if(InputHandler.isKeyDown(GLFW_KEY_UP)){
-            System.out.println("Up Pressed");
+        else if(InputHandler.isKeyDown(GLFW_KEY_UP)){
+            //System.out.println("Up Pressed");
             
             if(game.gameState == State.GAME_SCREEN_WAITING){
                 game.centerPiece.moveUp();
                 game.setGameState(State.GAME_SCREEN_MOVING);
             }
         }
-        if(InputHandler.isKeyDown(GLFW_KEY_LEFT)){
-            System.out.println("Left Pressed");
+        else if(InputHandler.isKeyDown(GLFW_KEY_LEFT)){
+            //System.out.println("Left Pressed");
             
             if(game.gameState == State.GAME_SCREEN_WAITING){
                 game.centerPiece.moveLeft();
                 game.setGameState(State.GAME_SCREEN_MOVING);
             }
         }
-        if(InputHandler.isKeyDown(GLFW_KEY_RIGHT)){
-            System.out.println("Right Pressed");
+        else if(InputHandler.isKeyDown(GLFW_KEY_RIGHT)){
+            //System.out.println("Right Pressed");
             
             if(game.gameState == State.GAME_SCREEN_WAITING){
                 game.centerPiece.moveRight();
                 game.setGameState(State.GAME_SCREEN_MOVING);
             }
+        } 
+        else if(InputHandler.isKeyDown(GLFW_KEY_ENTER)){
+            if(game.gameState == State.GAME_MENU || game.gameState == State.GAME_SCORES){
+                game.setGameState(State.GAME_SCREEN_WAITING);
+                game.currentAnswerTime = 5000;
+                game.remainingAnswerTime = game.currentAnswerTime;
+                game.beginTime = System.currentTimeMillis();
+                game.currentLifes = initialLifes;
+                game.numberOfMatches = 0;
+            }
+        }
+        else if(InputHandler.isKeyDown(GLFW_KEY_ESCAPE)){
+            glfwSetWindowShouldClose(window, true); 
+        }
+    }
+    
+    public static void updateTimer(Game game){
+        game.endTime = System.currentTimeMillis();
+        game.remainingAnswerTime -= (game.endTime - game.beginTime);
+        game.beginTime = game.endTime;
+        System.out.println(game.remainingAnswerTime);
+        
+        if(game.remainingAnswerTime <= 0){
+            game.currentLifes--;
+            changeGamePieces(game);
+            game.remainingAnswerTime = game.currentAnswerTime;
         }
     }
     
@@ -220,6 +256,246 @@ public class Game {
                 }
             }
         }
+    }
+    
+    public static void drawBackground(){
+        Texture texture = Texture.loadTexture(background);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texture.getId());
+        
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glBegin( GL_QUADS );
+
+        glTexCoord2f(0.0f, 0.0f);
+        GL11.glColor3f(0.9f, 0.9f, 0.9f);
+        glVertex2f(-1.0f, -1.0f);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex2f(1.0f, -1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        GL11.glColor3f(0.7f, 0.9f, 0.9f);
+        glVertex2f(1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        GL11.glColor3f(0.7f, 1.0f, 1.0f);
+        glVertex2f(-1.0f, 1.0f);
+
+        glEnd();
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glDisable(GL_TEXTURE_2D);
+    }
+    
+    public static void gameWaitingInput(Game game){
+        drawBackground();
+        
+        drawShape(game, ((GamePiece)game.centerPiece).getShape(), 0, 'c', 0, 0);
+        for(int j = 0; j < game.fixedPieces.size(); j++){
+            drawShape(game, ((GamePiece)game.fixedPieces.get(j)).getShape(), j, 'f', 0, 0);
+        }
+    }
+    
+    public static void gameMoving(Game game){
+        drawBackground();
+        
+        drawShape(game, ((GamePiece)game.centerPiece).getShape(), 0, 'c', dx, dy);
+        for(int j = 0; j < game.fixedPieces.size(); j++){
+            drawShape(game, ((GamePiece)game.fixedPieces.get(j)).getShape(), j, 'f', 0, 0);
+        }
+        
+        if(game.centerPiece.direction == 'd'){
+            dy += 8;
+            
+            if (game.centerPiece.point.y + dy >= SCREEN_HEIGHT - 50){
+                dx = 0;
+                dy = 0;
+                
+                if (game.solution == 'd'){
+                    System.out.println("Acertou!!!");
+                    game.numberOfMatches++;
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                        game.currentAnswerTime -= 250;
+                    }
+                } else {
+                    game.currentLifes--;
+                    System.out.println(game.currentLifes);
+                }
+                
+                changeGamePieces(game);
+                game.centerPiece.stopMoving();
+                game.setGameState(State.GAME_SCREEN_WAITING);
+                game.remainingAnswerTime = game.currentAnswerTime;
+            }
+        }
+        else if(game.centerPiece.direction == 'u'){
+            dy -= 8;
+            
+            if (game.centerPiece.point.y + dy <= 50){
+                dx = 0;
+                dy = 0;
+                
+                if (game.solution == 'u'){
+                    System.out.println("Acertou!!!");
+                    game.numberOfMatches++;
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                        game.currentAnswerTime -= 250;
+                    }
+                } else {
+                    game.currentLifes--;
+                    System.out.println(game.currentLifes);
+                }
+                
+                changeGamePieces(game);
+                game.centerPiece.stopMoving();
+                game.setGameState(State.GAME_SCREEN_WAITING);
+                game.remainingAnswerTime = game.currentAnswerTime;
+            }
+        }
+        else if(game.centerPiece.direction == 'r'){
+            dx += 10;
+            
+            if (game.centerPiece.point.x + dx >= SCREEN_WIDTH - 50){
+                dx = 0;
+                dy = 0;
+                
+                if (game.solution == 'r'){
+                    System.out.println("Acertou!!!");
+                    game.numberOfMatches++;
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                        game.currentAnswerTime -= 250;
+                    }
+                } else {
+                    game.currentLifes--;
+                    System.out.println(game.currentLifes);
+                }
+                
+                changeGamePieces(game);
+                game.centerPiece.stopMoving();
+                game.setGameState(State.GAME_SCREEN_WAITING);
+                game.remainingAnswerTime = game.currentAnswerTime;
+            }
+        }
+        else if(game.centerPiece.direction == 'l'){
+            dx -= 10;
+            
+            if (game.centerPiece.point.x + dx <= 50 && game.currentAnswerTime >= 1500){
+                dx = 0;
+                dy = 0;
+                
+                if (game.solution == 'l'){
+                    System.out.println("Acertou!!!");
+                    game.numberOfMatches++;
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                        game.currentAnswerTime -= 250;
+                    }
+                } else {
+                    game.currentLifes--;
+                    System.out.println(game.currentLifes);
+                }
+                
+                changeGamePieces(game);
+                game.centerPiece.stopMoving();
+                game.setGameState(State.GAME_SCREEN_WAITING);
+                game.remainingAnswerTime = game.currentAnswerTime;
+            }
+        }
+    }
+    
+    public static void gameMenu(Game game){
+        System.getProperty("user.dir");
+        System.out.println("oi");
+        
+        Texture texture = Texture.loadTexture(System.getProperty("user.dir") + "\\imgs\\menu.png");
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texture.getId());     
+        
+        GL11.glPushMatrix();
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glColor3f(1.0f, 1.0f, 0.8f);
+        glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex2f(0, 0);
+        glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex2f(SCREEN_WIDTH, 0);
+        glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
+        glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex2f(0, SCREEN_HEIGHT);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+        
+        glDisable(GL_TEXTURE_2D);
+    }
+    
+    public static void gameLoop(Game game){
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 1, -1);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+        // Setting stuff up for loop
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // Rendering Looop
+        while ( !glfwWindowShouldClose(window) ) {
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+                
+                switch (game.currentLifes){
+                    case 5:
+                        background = System.getProperty("user.dir") + "\\imgs\\crack1.png";
+                        break;
+                    case 4:
+                        background = System.getProperty("user.dir") + "\\imgs\\crack2.png";
+                        break;
+                    case 3:
+                        background = System.getProperty("user.dir") + "\\imgs\\crack3.png";
+                        break;
+                    case 2:
+                        background = System.getProperty("user.dir") + "\\imgs\\crack4.png";
+                        break;
+                    case 1:
+                        background = System.getProperty("user.dir") + "\\imgs\\crack5.png";
+                        break;
+                    case 0:
+                        game.setGameState(State.GAME_SCORES);
+                        break;
+                }
+                     
+                switch (game.gameState){
+                    case GAME_MENU:
+                        game.centerPieceIsMoving = false;
+                        gameMenu(game);
+                        break;
+                    case GAME_SCREEN_WAITING:
+                        game.centerPieceIsMoving = false;
+                        gameWaitingInput(game);
+                        updateTimer(game);
+                        break;
+                    case GAME_SCREEN_MOVING:
+                        game.centerPieceIsMoving = true;
+                        gameMoving(game);
+                        updateTimer(game);
+                        break;
+                    case GAME_SCORES:
+                        // mostra score
+                        break;
+                    default:
+                        break;
+                }
+                
+                // Should be in the end of the loop
+                glfwSwapBuffers(window); // swap the color buffers
+
+                glfwPollEvents();
+                update(game);
+        }
+        glDisable(GL_TEXTURE_2D);
     }
     
     public static void drawCircle(Game game, int index, char type, int dx, int dy){
@@ -370,128 +646,6 @@ public class Game {
                 break;
             }  
         }
-    }
-    
-    public static void gameWaitingInput(Game game){
-        drawShape(game, ((GamePiece)game.centerPiece).getShape(), 0, 'c', 0, 0);
-        for(int j = 0; j < game.fixedPieces.size(); j++){
-            drawShape(game, ((GamePiece)game.fixedPieces.get(j)).getShape(), j, 'f', 0, 0);
-        }
-    }
-    
-    public static void gameMoving(Game game){
-        drawShape(game, ((GamePiece)game.centerPiece).getShape(), 0, 'c', dx, dy);
-        for(int j = 0; j < game.fixedPieces.size(); j++){
-            drawShape(game, ((GamePiece)game.fixedPieces.get(j)).getShape(), j, 'f', 0, 0);
-        }
-        
-        if(game.centerPiece.direction == 'd'){
-            dy += 8;
-            
-            if (game.centerPiece.point.y + dy >= SCREEN_HEIGHT - 50){
-                dx = 0;
-                dy = 0;
-                
-                if (game.solution == 'd'){
-                    System.out.println("Acertou!!!");
-                } else {
-                    System.out.println("Errou!!");
-                }
-                
-                changeGamePieces(game);
-                game.centerPiece.stopMoving();
-                game.setGameState(State.GAME_SCREEN_WAITING);
-            }
-        }
-        else if(game.centerPiece.direction == 'u'){
-            dy -= 8;
-            
-            if (game.centerPiece.point.y + dy <= 50){
-                dx = 0;
-                dy = 0;
-                
-                if (game.solution == 'u'){
-                    System.out.println("Acertou!!!");
-                } else {
-                    System.out.println("Errou!!");
-                }
-                
-                changeGamePieces(game);
-                game.centerPiece.stopMoving();
-                game.setGameState(State.GAME_SCREEN_WAITING);
-            }
-        }
-        else if(game.centerPiece.direction == 'r'){
-            dx += 10;
-            
-            if (game.centerPiece.point.x + dx >= SCREEN_WIDTH - 50){
-                dx = 0;
-                dy = 0;
-                
-                if (game.solution == 'r'){
-                    System.out.println("Acertou!!!");
-                } else {
-                    System.out.println("Errou!!");
-                }
-                
-                changeGamePieces(game);
-                game.centerPiece.stopMoving();
-                game.setGameState(State.GAME_SCREEN_WAITING);
-            }
-        }
-        else if(game.centerPiece.direction == 'l'){
-            dx -= 10;
-            
-            if (game.centerPiece.point.x + dx <= 50){
-                dx = 0;
-                dy = 0;
-                
-                if (game.solution == 'l'){
-                    System.out.println("Acertou!!!");
-                } else {
-                    System.out.println("Errou!!");
-                }
-                
-                changeGamePieces(game);
-                game.centerPiece.stopMoving();
-                game.setGameState(State.GAME_SCREEN_WAITING);
-            }
-        }
-    }
-    
-    public static void gameLoop(Game game){
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 1, -1);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-
-        // Setting stuff up for loop
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-
-        // Rendering Looop
-        while ( !glfwWindowShouldClose(window) ) {
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-                
-                switch (game.gameState){
-                    case GAME_SCREEN_WAITING:
-                        gameWaitingInput(game);
-                        game.centerPieceIsMoving = false;
-                        break;
-                    case GAME_SCREEN_MOVING:
-                        game.centerPieceIsMoving = true;
-                        gameMoving(game);
-                        break;
-                    default:
-                        break;
-                }
-                
-                // Should be in the end of the loop
-                glfwSwapBuffers(window); // swap the color buffers
-
-                glfwPollEvents();
-                update(game);
-        }
-        glDisable(GL_TEXTURE_2D);
     }
     
     public static void main(String[] args) {
