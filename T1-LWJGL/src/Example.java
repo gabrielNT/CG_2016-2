@@ -115,8 +115,6 @@ public class Example {
 		// Set the clear color
 		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 
-                // Texture stuff
-                glEnable(GL_TEXTURE_2D);
                 Texture texture = Texture.loadTexture("C:\\Users\\gabri\\Documents\\NetBeansProjects\\T1-LWJGL\\t.png");
                 
 		// Run the rendering loop until the user has attempted to close
@@ -128,6 +126,8 @@ public class Example {
 			// invoked during this call.
 			glfwPollEvents();
                         
+                        // Texture stuff
+                        glEnable(GL_TEXTURE_2D);
                         glBindTexture(GL_TEXTURE_2D, texture.getId());
                         
                         GL11.glColor3f(1.0f, 1.0f, 1.0f);
@@ -153,6 +153,8 @@ public class Example {
 
                         GL11.glColor3f(0.5f, 1.0f, 1.0f);
                 
+                        glDisable(GL_TEXTURE_2D);
+                        
                          // draw quad
                         GL11.glPushMatrix();
                             //GL11.glTranslated(500, 500, 0);
@@ -162,6 +164,7 @@ public class Example {
 
                             GL11.glBegin(GL11.GL_QUADS);
                                 GL11.glVertex2f(x + 600, y + 400);
+                                GL11.glColor3f(0.5f, 0.0f, 0.9f);
                                 GL11.glVertex2f(x + 800, y + 400);
                                 GL11.glColor3f(0.5f, 0.7f, 0.8f);
                                 GL11.glVertex2f(x + 800, y + 600);
