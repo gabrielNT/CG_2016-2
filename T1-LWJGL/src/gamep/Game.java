@@ -36,6 +36,9 @@ public class Game {
     static int SCREEN_HEIGHT = 600;
     static int initialLifes = 5;
     static String background = System.getProperty("user.dir") + "\\imgs\\crack2.png";
+    static float shape_r = 0.8f;
+    static float shape_g = 0.3f;
+    static float shape_b = 0.3f;
     
     static int dx = 0, dy = 0;
     static long window;
@@ -410,9 +413,32 @@ public class Game {
     
     public static void gameMenu(Game game){
         System.getProperty("user.dir");
-        System.out.println("oi");
         
         Texture texture = Texture.loadTexture(System.getProperty("user.dir") + "\\imgs\\menu.png");
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texture.getId());     
+        
+        GL11.glPushMatrix();
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glColor3f(1.0f, 1.0f, 0.8f);
+        glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex2f(0, 0);
+        glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex2f(SCREEN_WIDTH, 0);
+        glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT);
+        glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex2f(0, SCREEN_HEIGHT);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+        
+        glDisable(GL_TEXTURE_2D);
+    }
+    
+    public static void gameScore(Game game) {
+        System.getProperty("user.dir");
+        
+        Texture texture = Texture.loadTexture(System.getProperty("user.dir") + "\\imgs\\broken.png");
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, texture.getId());     
         
@@ -483,7 +509,7 @@ public class Game {
                         updateTimer(game);
                         break;
                     case GAME_SCORES:
-                        // mostra score
+                        gameScore(game);
                         break;
                     default:
                         break;
@@ -499,7 +525,7 @@ public class Game {
     }
     
     public static void drawCircle(Game game, int index, char type, int dx, int dy){
-        GL11.glColor3f(1.0f, 0.8f, 0.0f);        
+        GL11.glColor3f(shape_r, shape_g, shape_b);        
         GL11.glPushMatrix();
         GL11.glTranslated(dx, dy, 0);
         GL11.glBegin(GL11.GL_TRIANGLE_FAN);
@@ -507,11 +533,13 @@ public class Game {
             for(int i = 0; i < ((GamePiece)game.fixedPieces.get(index)).points.size(); i++){
                 GL11.glVertex2f((float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getX(), 
                                 (float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getY());
+                GL11.glColor3f(shape_r + i * 0.05f, shape_g - i * 0.05f, shape_b - i * 0.05f);
             }
         } else if(type == 'c'){
             for(int i = 0; i < game.centerPiece.points.size(); i++){
                 GL11.glVertex2f((float)((Point)(game.centerPiece.points.get(i))).getX(), 
                                 (float)((Point)(game.centerPiece.points.get(i))).getY());
+                GL11.glColor3f(shape_r + i * 0.05f, shape_g - i * 0.05f, shape_b - i * 0.05f);
             }
         }
         GL11.glEnd();
@@ -519,7 +547,7 @@ public class Game {
     }
     
     public static void drawDiamond(Game game, int index, char type, int dx, int dy){
-        GL11.glColor3f(1.0f, 0.8f, 0.0f);        
+        GL11.glColor3f(0.8f, 0.3f, 0.3f);        
         GL11.glPushMatrix();
         GL11.glTranslated(dx, dy, 0);
         GL11.glBegin(GL11.GL_TRIANGLES);
@@ -527,11 +555,13 @@ public class Game {
             for(int i = 0; i < ((GamePiece)game.fixedPieces.get(index)).points.size(); i++){
                 GL11.glVertex2f((float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getX(), 
                                 (float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         } else if(type == 'c'){
             for(int i = 0; i < game.centerPiece.points.size(); i++){
                 GL11.glVertex2f((float)((Point)(game.centerPiece.points.get(i))).getX(), 
                                 (float)((Point)(game.centerPiece.points.get(i))).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         }
         GL11.glEnd();
@@ -539,7 +569,7 @@ public class Game {
     }
     
     public static void drawTriangle(Game game, int index, char type, int dx, int dy){
-        GL11.glColor3f(1.0f, 0.8f, 0.0f);        
+        GL11.glColor3f(0.8f, 0.3f, 0.3f);        
         GL11.glPushMatrix();
         GL11.glTranslated(dx, dy, 0);
         GL11.glBegin(GL11.GL_TRIANGLES);
@@ -547,11 +577,13 @@ public class Game {
             for(int i = 0; i < ((GamePiece)game.fixedPieces.get(index)).points.size(); i++){
                 GL11.glVertex2f((float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getX(), 
                                 (float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         } else if(type == 'c'){
             for(int i = 0; i < game.centerPiece.points.size(); i++){
                 GL11.glVertex2f((float)((Point)(game.centerPiece.points.get(i))).getX(), 
                                 (float)((Point)(game.centerPiece.points.get(i))).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         }
         GL11.glEnd();
@@ -559,7 +591,7 @@ public class Game {
     }
     
     public static void drawHourglass(Game game, int index, char type, int dx, int dy){
-        GL11.glColor3f(1.0f, 0.8f, 0.0f);        
+        GL11.glColor3f(0.8f, 0.3f, 0.3f);        
         GL11.glPushMatrix();
         GL11.glTranslated(dx, dy, 0);
         GL11.glBegin(GL11.GL_TRIANGLES);
@@ -579,7 +611,7 @@ public class Game {
     }
     
     public static void drawSquare(Game game, int index, char type, int dx, int dy){
-        GL11.glColor3f(1.0f, 0.8f, 0.0f);        
+        GL11.glColor3f(0.8f, 0.3f, 0.3f);        
         GL11.glPushMatrix();
         GL11.glTranslated(dx, dy, 0);
         GL11.glBegin(GL11.GL_QUADS);
@@ -587,11 +619,13 @@ public class Game {
             for(int i = 0; i < ((GamePiece)game.fixedPieces.get(index)).points.size(); i++){
                 GL11.glVertex2f((float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getX(), 
                                 (float)((Point)((GamePiece)game.fixedPieces.get(index)).points.get(i)).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         } else if(type == 'c'){
             for(int i = 0; i < game.centerPiece.points.size(); i++){
                 GL11.glVertex2f((float)((Point)(game.centerPiece.points.get(i))).getX(), 
                                 (float)((Point)(game.centerPiece.points.get(i))).getY());
+                GL11.glColor3f(shape_r + i * 0.5f, shape_g - i * 0.5f, shape_b - i * 0.3f);
             }
         }
         GL11.glEnd();

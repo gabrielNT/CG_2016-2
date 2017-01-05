@@ -129,18 +129,18 @@ public class GamePiece {
     }
     
     void createHourglassPoints(){
-        this.points.add(new Point((int)this.point.getX() - radius,
-                                  (int)this.point.getY() - radius));
         this.points.add(new Point((int)this.point.getX() + radius,
-                                  (int)this.point.getY() - radius));
-        this.points.add(new Point((int)this.point.getX(),
                                   (int)this.point.getY() + radius));
+        this.points.add(new Point((int)this.point.getX() - radius,
+                                  (int)this.point.getY() + radius));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() - radius));
         
-        this.points.add(new Point((int)this.point.getX() + radius,
-                                  (int)this.point.getY() + radius));
         this.points.add(new Point((int)this.point.getX() - radius,
-                                  (int)this.point.getY() + radius));
-        this.points.add(new Point((int)this.point.getX(),
                                   (int)this.point.getY() - radius));
+        this.points.add(new Point((int)this.point.getX() + radius,
+                                  (int)this.point.getY() - radius));
+        this.points.add(new Point((int)this.point.getX(),
+                                  (int)this.point.getY() + radius)); 
     }
 }
