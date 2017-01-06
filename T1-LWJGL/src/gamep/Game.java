@@ -301,6 +301,8 @@ public class Game {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+        
+        texture.delete();    
         glDisable(GL_TEXTURE_2D);
     }
     
@@ -450,6 +452,7 @@ public class Game {
         GL11.glPopMatrix();
         
         glDisable(GL_TEXTURE_2D);
+        texture.delete(); 
     }
     
     public static void gameScore(Game game) {
@@ -477,6 +480,7 @@ public class Game {
         printFinalScore();
         
         glDisable(GL_TEXTURE_2D);
+        texture.delete(); 
     }
     
     public static void printFinalScore()
