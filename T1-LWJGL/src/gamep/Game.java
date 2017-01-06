@@ -334,7 +334,7 @@ public class Game {
                     //System.out.println("Acertou!!!");
                     currentScore += 10;
                     game.numberOfMatches++;
-                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1500){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
@@ -360,7 +360,7 @@ public class Game {
                     //System.out.println("Acertou!!!");
                     currentScore += 10;
                     game.numberOfMatches++;
-                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1500){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
@@ -386,7 +386,7 @@ public class Game {
                     //System.out.println("Acertou!!!");
                     currentScore += 10;
                     game.numberOfMatches++;
-                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1500){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
@@ -404,7 +404,7 @@ public class Game {
         else if(game.centerPiece.direction == 'l'){
             dx -= 10;
             
-            if (game.centerPiece.point.x + dx <= 50 && game.currentAnswerTime >= 1500){
+            if (game.centerPiece.point.x + dx <= 50){
                 dx = 0;
                 dy = 0;
                 
@@ -412,7 +412,7 @@ public class Game {
                     //System.out.println("Acertou!!!");
                     currentScore += 10;
                     game.numberOfMatches++;
-                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1750){
+                    if (game.numberOfMatches % 3 == 0 && game.currentAnswerTime > 1500){
                         game.currentAnswerTime -= 250;
                     }
                 } else {
@@ -596,7 +596,7 @@ public class Game {
         lineHeight = BASE_FONT_HEIGHT;
 
 
-        GL11.glColor3f(169f / 255f, 183f / 255f, 198f / 255f); // Text color
+        GL11.glColor3f(0f,0f,0f); // Text color
         float scaleFactor = 1.0f + scale * 0.25f;
         GL11.glPushMatrix();
                 GL11.glScalef(scaleFactor, scaleFactor, 1f);
@@ -620,7 +620,7 @@ public class Game {
         lineHeight = BASE_FONT_HEIGHT;
 
 
-        GL11.glColor3f(169f / 255f, 183f / 255f, 198f / 255f); // Text color
+        GL11.glColor3f(0f,0f,0f); // Text color
         float scaleFactor = 1.0f + scale * 0.25f;
         GL11.glPushMatrix();
                 GL11.glScalef(scaleFactor, scaleFactor, 1f);
