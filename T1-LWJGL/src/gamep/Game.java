@@ -439,7 +439,7 @@ public class Game {
         
         GL11.glPushMatrix();
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glColor3f(1.0f, 1.0f, 0.8f);
+        GL11.glColor3f(1.0f, 1.0f, 1.0f);
         glTexCoord2f(0.0f, 1.0f);
         GL11.glVertex2f(0, 0);
         glTexCoord2f(1.0f, 1.0f);
@@ -464,7 +464,7 @@ public class Game {
         
         GL11.glPushMatrix();
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glColor3f(1.0f, 1.0f, 0.8f);
+        GL11.glColor3f(1.0f, 1.0f, 1.0f);
         glTexCoord2f(0.0f, 1.0f);
         GL11.glVertex2f(0, 0);
         glTexCoord2f(1.0f, 1.0f);
